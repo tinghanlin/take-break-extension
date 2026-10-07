@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Take a Break">
+  <rect width="128" height="128" rx="28" fill="#087f8c"/>
+  <circle cx="64" cy="64" r="42" fill="#ffffff"/>
+  <path d="M64 33a31 31 0 1 0 31 31" fill="none" stroke="#f6c85f" stroke-width="10" stroke-linecap="round"/>
+  <path d="M64 43v24l18 12" fill="none" stroke="#17202a" stroke-width="9" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

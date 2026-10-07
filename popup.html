@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Take a Break</title>
+    <link rel="stylesheet" href="popup.css">
+  </head>
+  <body>
+    <main class="panel">
+      <header class="header">
+        <div>
+          <p class="eyebrow">Chrome timer</p>
+          <h1>Take a Break</h1>
+        </div>
+        <div class="status-dot" id="statusDot" aria-hidden="true"></div>
+      </header>
+
+      <section class="progress-area" aria-label="Timer progress">
+        <div class="ring" id="progressRing">
+          <span id="progressText">0%</span>
+        </div>
+        <div>
+          <p class="label" id="timerLabel">Counting while Chrome is open</p>
+          <p class="time" id="timeText">0 min of 50 min</p>
+        </div>
+      </section>
+
+      <form id="settingsForm" class="settings">
+        <label>
+          <span>Remind me after</span>
+          <div class="input-row">
+            <input id="workMinutes" type="number" min="1" max="240" step="1" required>
+            <span>minutes</span>
+          </div>
+        </label>
+
+        <label class="toggle">
+          <input id="notificationsEnabled" type="checkbox">
+          <span>Show desktop notifications</span>
+        </label>
+
+        <label class="toggle">
+          <input id="weatherEnabled" type="checkbox">
+          <span>Weather-aware walk suggestions</span>
+        </label>
+
+        <label>
+          <span>Weather city</span>
+          <input id="weatherCity" type="text" maxlength="100" placeholder="Chicago" autocomplete="off">
+        </label>
+        <p class="weather-status" id="weatherStatus" role="status"></p>
+
+        <button class="primary" type="submit">Save settings</button>
+      </form>
+
+      <div class="actions">
+        <button id="pauseTimer" type="button">Pause timer</button>
+        <button id="resetTimer" type="button">Reset timer</button>
+      </div>
+
+      <button id="testNotification" class="test-notification" type="button">Test notification</button>
+      <p class="notification-status" id="notificationStatus" role="status" hidden></p>
+      <p class="feedback" id="feedback" role="status" aria-live="polite"></p>
+      <a class="weather-credit" href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer">Weather: Open-Meteo</a>
+    </main>
+
+    <script src="popup.js"></script>
+  </body>
+</html>

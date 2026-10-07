@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Take a Break Reminder",
+  "description": "Customize reminders that nudge you to take a break while Chrome windows are open.",
+  "version": "1.0.0",
+  "minimum_chrome_version": "120",
+  "icons": { "128": "icon.png" },
+  "permissions": [
+    "alarms",
+    "idle",
+    "notifications",
+    "storage"
+  ],
+  "optional_host_permissions": [
+    "https://api.open-meteo.com/*",
+    "https://geocoding-api.open-meteo.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_icon": "icon.png",
+    "default_title": "Take a Break",
+    "default_popup": "popup.html"
+  }
+}
