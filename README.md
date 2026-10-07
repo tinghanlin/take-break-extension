@@ -126,22 +126,3 @@ node --test tests/notifications.test.js tests/popup.test.js
 ```
 
 The tests simulate Chrome APIs. They do not verify real desktop banners, Chrome's window and lock events, or extension permission prompts. Before sharing a release, load the extension in Chrome, check the test notification, try a one-minute interval with the popup closed, and verify Pause/Resume and weather access.
-
-## Share on GitHub
-
-1. Create an empty repository on GitHub, for example `take-break-extension`. Choose **Public** if you want anyone to download it. Leave the options to initialize a README, license, and `.gitignore` unchecked because the local project already has files.
-2. From a terminal in this project folder, run:
-
-```sh
-git init -b main
-git add .
-git diff --cached --stat
-git commit -m "Initial Chrome break reminder extension"
-git remote add origin https://github.com/YOUR_USERNAME/take-break-extension.git
-git push -u origin main
-```
-
-Replace `YOUR_USERNAME` with your GitHub username. Authenticate to GitHub using GitHub CLI, GitHub Desktop, or a configured Git credential manager before pushing. See [GitHub's guide to uploading local code](https://docs.github.com/en/migrations/importing-source-code/using-the-command-line-to-import-source-code/adding-locally-hosted-code-to-github).
-
-3. Choose a license before advertising the project as open source. No project license has been selected yet. You can add a `LICENSE` file locally before the first commit or use GitHub's license picker after uploading. See [GitHub's licensing guide](https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository).
-4. Share the repository link. Recipients can use **Code > Download ZIP**, extract it, and follow **Install locally** above. GitHub hosts the source; users still load the extension manually in Chrome.
