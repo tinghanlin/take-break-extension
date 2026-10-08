@@ -17,6 +17,7 @@ const DEFAULT_STATE = {
 };
 
 const TICK_ALARM = "takeBreakTick";
+const IDLE_RESET_SECONDS = 10 * 60;
 const NOTIFICATION_ID = "take-break-reminder";
 const WEATHER_ORIGINS = [
   "https://api.open-meteo.com/*",
@@ -37,14 +38,14 @@ chrome.runtime.onInstalled.addListener(() => runTask(async () => {
   await chrome.storage.local.set({ settings: sanitizeSettings(settings) });
   await saveState({ ...DEFAULT_STATE, ...state });
 
-  chrome.idle.setDetectionInterval(60);
+  chrome.idle.setDetectionInterval(IDLE_RESET_SECONDS);
   await chrome.alarms.clear("takeBreakSnooze");
   await chrome.alarms.create(TICK_ALARM, { periodInMinutes: 0.5 });
   await syncCurrentActivity();
 }));
 
 chrome.runtime.onStartup.addListener(() => runTask(async () => {
-  chrome.idle.setDetectionInterval(60);
+  chrome.idle.setDetectionInterval(IDLE_RESET_SECONDS);
   await chrome.alarms.clear("takeBreakSnooze");
   await chrome.alarms.create(TICK_ALARM, { periodInMinutes: 0.5 });
   await syncCurrentActivity();
@@ -70,6 +71,9 @@ chrome.idle.onStateChanged.addListener((idleState) => runTask(async () => {
   await updateStateWithElapsed();
   const state = await getState();
   state.idleState = idleState;
+  if (idleState === "idle") {
+    state.accumulatedMs = 0;
+  }
   state.lastActiveStart = shouldCountTime(state) ? Date.now() : null;
   await saveState(state);
 }));
@@ -176,13 +180,16 @@ async function syncCurrentActivity() {
     state.hasOpenWindow = false;
   }
 
-  state.idleState = await chrome.idle.queryState(60);
+  state.idleState = await chrome.idle.queryState(IDLE_RESET_SECONDS);
+  if (state.idleState === "idle") {
+    state.accumulatedMs = 0;
+  }
   state.lastActiveStart = shouldCountTime(state) ? Date.now() : null;
   await saveState(state);
 }
 
 function shouldCountTime(state) {
-  return !state.isPaused && state.hasOpenWindow && state.idleState !== "locked";
+  return !state.isPaused && state.hasOpenWindow && state.idleState === "active";
 }
 
 async function showReminder(settings, state, test = false) {
@@ -355,6 +362,7 @@ function clampInteger(value, min, max, fallback) {
 
 // Alarms can disappear across reloads; restore the reminder check on worker startup.
 runTask(async () => {
+  chrome.idle.setDetectionInterval(IDLE_RESET_SECONDS);
   const alarm = await chrome.alarms.get(TICK_ALARM);
   if (!alarm || alarm.periodInMinutes !== 0.5) {
     await chrome.alarms.create(TICK_ALARM, { periodInMinutes: 0.5 });

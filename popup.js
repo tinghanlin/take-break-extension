@@ -144,9 +144,11 @@ async function refresh() {
   if (isPaused) {
     timerLabel.textContent = "Timer paused";
   } else if (active) {
-    timerLabel.textContent = "Counting while Chrome is open";
+    timerLabel.textContent = "Counting active Chrome time";
   } else if (state.idleState === "locked") {
     timerLabel.textContent = "Paused while your computer is locked";
+  } else if (state.idleState === "idle") {
+    timerLabel.textContent = "Reset after inactivity";
   } else {
     timerLabel.textContent = "Paused while Chrome windows are closed";
   }

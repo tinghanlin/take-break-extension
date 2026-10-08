@@ -11,6 +11,7 @@ function createWorker({ paused = false, enabled = true, weatherEnabled = false }
   let weatherPermission = true;
   let weatherError = false;
   let weatherAge = 0;
+  let idleState = "active";
   let current = {
     is_day: 1, weather_code: 1, apparent_temperature: 20, precipitation: 0,
     wind_speed_10m: 10, wind_gusts_10m: 15
@@ -39,7 +40,7 @@ function createWorker({ paused = false, enabled = true, weatherEnabled = false }
     },
     idle: {
       onStateChanged: event("idle"), setDetectionInterval() {},
-      async queryState() { return "active"; }
+      async queryState() { return idleState; }
     },
     alarms: {
       onAlarm: event("alarm"),
@@ -82,6 +83,7 @@ function createWorker({ paused = false, enabled = true, weatherEnabled = false }
     weather(values, age = 0) { current = { ...current, ...values }; weatherAge = age; },
     weatherOffline() { weatherError = true; },
     denyWeather() { weatherPermission = false; },
+    setIdleState(state) { idleState = state; },
     message(data) {
       return new Promise((resolve) => listeners.message(data, {}, resolve));
     }
@@ -217,6 +219,24 @@ test("pause and disabled notifications prevent automatic reminders", async () =>
     await worker.message({ type: "getData" });
     assert.equal(worker.notifications.length, 0);
   }
+});
+
+test("ten-minute idle state resets time and waits for activity", async () => {
+  const worker = createWorker();
+  worker.advance(1000);
+  worker.setIdleState("idle");
+  await worker.listeners.idle("idle");
+  assert.equal(worker.stored.state.accumulatedMs, 0);
+  assert.equal(worker.stored.state.lastActiveStart, null);
+  worker.advance(5 * 60000);
+  await worker.listeners.alarm({ name: "takeBreakTick" });
+  assert.equal(worker.stored.state.accumulatedMs, 0);
+  worker.setIdleState("active");
+  await worker.listeners.idle("active");
+  worker.advance(30000);
+  const response = await worker.message({ type: "getData" });
+  assert.equal(response.active, true);
+  assert.equal(response.state.accumulatedMs, 30000);
 });
 
 test("notification asset is a 128px PNG and is registered in the manifest", () => {

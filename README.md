@@ -14,7 +14,7 @@ flowchart TD
     end
 
     alarms["chrome.alarms<br/>Reminder checks every 30 seconds"]
-    activity["Chrome window and idle events<br/>Windows open/close; computer locks/unlocks"]
+    activity["Chrome window and idle events<br/>Windows open/close; 10-minute inactivity; computer locks/unlocks"]
     weather["Open-Meteo APIs<br/>City lookup, current weather, daylight"]
     notifications["chrome.notifications<br/>Create desktop notification using icon.png"]
     desktop["macOS notification system<br/>Displays banner or alert according to Notifications and Focus settings"]
@@ -33,7 +33,7 @@ flowchart TD
 
 The diagram renders in Markdown viewers that support Mermaid, including GitHub.
 
-1. **Count time:** The background worker counts elapsed time while any Chrome browser window is open, unless manually paused or the computer is locked. Chrome alarms keep reminder checks running when the popup is closed; opening the popup adds checks every second.
+1. **Count time:** The background worker counts elapsed time while any Chrome browser window is open and Chrome reports recent computer activity, unless manually paused or the computer is locked. After 10 minutes without mouse or keyboard activity, the timer resets and waits for activity before counting again. Chrome alarms keep reminder checks running when the popup is closed; opening the popup adds checks every second.
 2. **Build the reminder:** When the configured interval is reached and automatic notifications are enabled, the worker rotates the message. Optional weather checks suggest a walk only in suitable daylight conditions; missing or unsuitable weather produces an indoor suggestion.
 3. **Deliver and save:** The worker asks Chrome to create the notification. On success, it resets the timer and advances the message rotation. On failure, it preserves elapsed time and shows the error in the popup. Test notifications preview a message without resetting, resuming, or advancing the timer's rotation.
 
@@ -59,7 +59,7 @@ Click the extension icon in Chrome to set:
 - whether desktop notifications are enabled
 - whether reminders use the weather to suggest a walk, and which city to check
 
-The timer counts whenever at least one Chrome browser window is open, including unfocused or minimized windows on any display. Multiple windows count as one timer. Mouse and keyboard inactivity does not pause it. It stops when all Chrome windows are closed or your computer is locked.
+The timer counts whenever at least one Chrome browser window is open and Chrome reports recent mouse or keyboard activity, including unfocused or minimized windows on any display. Multiple windows count as one timer. After 10 minutes without mouse or keyboard activity, the timer treats that as a break: it resets elapsed time to zero and waits for activity before counting again. It also stops when all Chrome windows are closed or your computer is locked.
 Use **Pause timer** to stop counting and reminders without losing elapsed time. Use **Resume timer** to continue. Your pause choice is saved when the popup closes or Chrome restarts.
 After each reminder, the timer resets automatically for the next interval. Breaks are not timed.
 
